@@ -3,400 +3,381 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flower Garden For You</title>
+    <title>Quantum Void Experience</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: radial-gradient(circle at center, #111 0%, #000 100%);
-            color: #fff;
-            font-family: 'Segoe UI', sans-serif;
-            overflow: hidden;
-            height: 100vh;
+        :root { --primary: #ff0055; --bg: #020202; }
+        
+        html, body { 
+            margin: 0; 
+            padding: 0; 
+            width: 100%;
+            overflow-x: hidden; 
+            background-color: var(--bg); 
+            color: white; 
+            font-family: 'Helvetica Neue', sans-serif; 
+            -webkit-font-smoothing: antialiased;
         }
         
-        #ui-top {
-            position: absolute;
-            top: 15%;
-            width: 100%;
-            text-align: center;
-            z-index: 10;
-            pointer-events: none;
-            transition: opacity 0.5s;
-        }
-        h1 { font-size: 1.2rem; color: #ffb3c6; margin-bottom: 10px; font-weight: 400; letter-spacing: 1px; }
-        h2 { font-size: 2.8rem; font-weight: 600; color: #fff; text-shadow: 0 0 20px rgba(255, 194, 209, 0.4); margin-bottom: 5px; }
-        p { font-size: 1rem; color: #aaa; }
-
-        #ui-bottom {
-            position: absolute;
-            bottom: 8%; 
-            width: 100%;
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            z-index: 10;
-            pointer-events: auto;
-            transition: opacity 0.5s;
-        }
-        button {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            padding: 12px 25px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-        button:hover { background: rgba(255, 255, 255, 0.15); border-color: #ffb3c6; box-shadow: 0 0 15px rgba(255, 179, 198, 0.3); }
-
-        #watermark {
-            position: absolute;
-            bottom: 2%;
-            width: 100%;
-            text-align: center;
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.3);
-            z-index: 10;
-            pointer-events: none;
-            letter-spacing: 1px;
-            transition: opacity 0.5s;
-        }
-
         canvas { 
-            position: absolute; 
+            position: fixed; 
             top: 0; 
             left: 0; 
-            width: 100vw; 
-            height: 100vh; 
-            touch-action: none; 
+            z-index: 1; 
+            width: 100%; 
+            height: 100%; 
+            outline: none; 
+            pointer-events: none;
+        }
+        
+        .scroll-container { position: relative; width: 100%; height: 1000vh; z-index: 2; }
+        
+        .section { height: 200vh; display: flex; align-items: center; justify-content: center; position: relative; padding: 0 20px; box-sizing: border-box; }
+        
+        /* MOBILE RESPONSIVE PANEL ADJUSTMENTS */
+        .glass-panel { 
+            background: rgba(255, 255, 255, 0.02); 
+            backdrop-filter: blur(15px); 
+            -webkit-backdrop-filter: blur(15px);
+            padding: 30px min(8vw, 60px); 
+            border-radius: 20px; 
+            border: 1px solid rgba(255,255,255,0.08);
+            text-align: center;
+            width: 100%;
+            max-width: 540px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+        }
+        
+        /* CLAMP TEXT TO PREVENT MOBILE CLIPPING */
+        h1 { font-size: clamp(2.2rem, 7vw, 4.5rem); text-transform: uppercase; letter-spacing: 4px; margin: 0; font-weight: 900; background: linear-gradient(45deg, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        p { font-size: clamp(0.9rem, 3vw, 1.2rem); letter-spacing: 2px; color: #00d2ff; margin-top: 15px; font-weight: 400; text-transform: uppercase; }
+
+        .audio-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+        @media (hover: hover) {
+            .audio-btn:hover {
+                background: #ff0055;
+                box-shadow: 0 0 15px #ff0055;
+                border-color: transparent;
+            }
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.65rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+            animation: pulse 2s infinite alternate;
+        }
+        .mouse {
+            width: 18px;
+            height: 28px;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-radius: 20px;
+            position: relative;
+        }
+        .wheel {
+            width: 3px;
+            height: 6px;
+            background-color: #ff0055;
+            border-radius: 2px;
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: scrollWheel 1.5s infinite;
+        }
+        @keyframes scrollWheel {
+            0% { opacity: 1; top: 4px; }
+            100% { opacity: 0; top: 16px; }
+        }
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.8; }
         }
     </style>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
 </head>
 <body>
 
-    <div id="ui-top">
-        <h1>🌸 Flower Garden For You</h1>
-        <p>Tap or Swipe Anywhere to</p>
-        <h2>Plant Flowers</h2>
-        <p>or turn on Auto Bloom</p>
+    <button class="audio-btn" id="audioInit">Init Synth Drone</button>
+    <canvas id="webgl"></canvas>
+
+    <div class="scroll-container">
+        <div class="section">
+            <div class="glass-panel">
+                <h1>The Awakening</h1>
+                <p>Scroll down to descend into void</p>
+            </div>
+            <div class="scroll-indicator">
+                <div class="mouse"><div class="wheel"></div></div>
+                <span>Scroll to Warp</span>
+            </div>
+        </div>
+        <div class="section">
+            <div class="glass-panel">
+                <h1>Quantum Tunnel</h1>
+                <p>Accelerating through dark matter</p>
+            </div>
+        </div>
+        <div class="section">
+            <div class="glass-panel">
+                <h1>The Core</h1>
+                <p>Unstable energy detected</p>
+            </div>
+        </div>
+        <div class="section">
+            <div class="glass-panel">
+                <h1>Event Horizon</h1>
+                <p>Beyond the point of no return</p>
+            </div>
+        </div>
+        <div class="section">
+            <div class="glass-panel">
+                <h1>Ascension</h1>
+                <p>System Online. Welcome.</p>
+            </div>
+        </div>
     </div>
 
-    <div id="ui-bottom">
-        <button id="clearBtn">Clear Garden</button>
-        <button id="autoBloomBtn">▶ Auto Bloom</button>
-    </div>
+    <script type="module">
+        import * as THREE from 'three';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
-    <div id="watermark">Made By Manik~</div>
-
-    <audio id="bgm" loop>
-        <source src="dandelions.mp3" type="audio/mpeg">
-    </audio>
-
-    <canvas id="garden"></canvas>
-
-    <script>
-        const canvas = document.getElementById('garden');
-        const ctx = canvas.getContext('2d');
+        const canvas = document.querySelector('#webgl');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x020202, 0.015);
         
-        let width, height;
-        let flowers = [];
-        let vines = [];
-        let autoBloomInterval = null;
-        let time = 0;
-        
-        const palettes = [
-            { main: 'rgba(255, 126, 179, 0.8)', glow: '#ff7eb3' }, 
-            { main: 'rgba(255, 185, 208, 0.8)', glow: '#ffb9d0' }, 
-            { main: 'rgba(168, 230, 207, 0.8)', glow: '#a8e6cf' }, 
-            { main: 'rgba(220, 175, 255, 0.8)', glow: '#dcafff' }, 
-            { main: 'rgba(255, 211, 132, 0.8)', glow: '#ffd384' }  
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const renderScene = new RenderPass(scene, camera);
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 2.5, 0.4, 0.85);
+        bloomPass.threshold = 0.05;
+        bloomPass.strength = 2.2;
+        bloomPass.radius = 0.6;
+
+        const composer = new EffectComposer(renderer);
+        composer.addPass(renderScene);
+        composer.addPass(bloomPass);
+
+        const pathPoints = [
+            new THREE.Vector3(0, 0, 100),
+            new THREE.Vector3(15, 10, 30),
+            new THREE.Vector3(-20, -10, -40),
+            new THREE.Vector3(25, 5, -110),
+            new THREE.Vector3(0, 0, -200)
         ];
+        const curve = new THREE.CatmullRomCurve3(pathPoints);
 
-        const preRenderedFlowers = [];
-        const cacheSize = 250; 
+        const warpShaderMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                uTime: { value: 0 },
+                uWarp: { value: 0.0 },
+                uSize: { value: window.innerWidth < 768 ? 0.12 : 0.18 } // Slightly smaller points on mobile
+            },
+            vertexShader: `
+                uniform float uTime;
+                uniform float uWarp;
+                uniform float uSize;
+                attribute vec3 color;
+                varying vec3 vColor;
+                void main() {
+                    vColor = color;
+                    vec3 p = position;
+                    p.x += sin(uTime * 0.5 + p.z * 0.1) * 0.15;
+                    p.y += cos(uTime * 0.4 + p.x * 0.1) * 0.15;
+                    vec4 mvPosition = modelViewMatrix * vec4(p, 1.0);
+                    mvPosition.z += (uWarp * 15.0) * normalize(mvPosition.z); 
+                    gl_Position = projectionMatrix * mvPosition;
+                    gl_PointSize = uSize * (300.0 / -mvPosition.z) * (1.0 + uWarp * 2.0);
+                }
+            `,
+            fragmentShader: `
+                varying vec3 vColor;
+                void main() {
+                    vec2 coord = gl_PointCoord - vec2(0.5);
+                    if(length(coord) > 0.5) discard;
+                    gl_FragColor = vec4(vColor, 1.0);
+                }
+            `,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
 
-        function initPreRenders() {
-            const dpr = Math.min(window.devicePixelRatio || 1, 3); 
+        const particleCount = window.innerWidth < 768 ? 9000 : 15000; // Performance optimization for mobile screens
+        const positions = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+        const c1 = new THREE.Color(0xff0055), c2 = new THREE.Color(0x00d2ff), c3 = new THREE.Color(0x7000ff);
+
+        for (let i = 0; i < particleCount; i++) {
+            const t = Math.random();
+            const pathPoint = curve.getPointAt(t);
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 4 + Math.random() * 26;
             
-            palettes.forEach(palette => {
-                for(let v = 0; v < 3; v++) {
-                    const pCanvas = document.createElement('canvas');
-                    pCanvas.width = cacheSize * dpr;
-                    pCanvas.height = cacheSize * dpr;
-                    const pCtx = pCanvas.getContext('2d');
-                    pCtx.scale(dpr, dpr);
-                    
-                    const center = cacheSize / 2;
-                    const petalCount = Math.floor(Math.random() * 3) + 5;
-                    const petalSize = Math.random() * 15 + 35; 
+            positions[i * 3] = pathPoint.x + Math.cos(angle) * radius;
+            positions[i * 3 + 1] = pathPoint.y + Math.sin(angle) * radius;
+            positions[i * 3 + 2] = pathPoint.z + (Math.random() - 0.5) * 8;
 
-                    pCtx.translate(center, center);
-                    
-                    pCtx.shadowBlur = 30; 
-                    pCtx.shadowColor = palette.glow;
-                    pCtx.globalCompositeOperation = 'screen';
-
-                    for (let layer = 0; layer < 2; layer++) {
-                        const layerScale = layer === 0 ? 1 : 0.6;
-                        const layerPetals = layer === 0 ? petalCount : petalCount - 1;
-                        pCtx.fillStyle = layer === 0 ? palette.main : '#ffffff';
-                        
-                        for (let i = 0; i < layerPetals; i++) {
-                            pCtx.save();
-                            pCtx.rotate((Math.PI * 2 / layerPetals) * i + (Math.PI / 4));
-                            pCtx.scale(layerScale, layerScale);
-                            
-                            pCtx.beginPath();
-                            pCtx.moveTo(0, 0);
-                            pCtx.bezierCurveTo(-petalSize / 1.5, -petalSize / 2, -petalSize / 2, -petalSize, 0, -petalSize * 1.2);
-                            pCtx.bezierCurveTo(petalSize / 2, -petalSize, petalSize / 1.5, -petalSize / 2, 0, 0);
-                            pCtx.fill();
-                            pCtx.restore();
-                        }
-                    }
-
-                    pCtx.beginPath();
-                    pCtx.arc(0, 0, 6, 0, Math.PI * 2);
-                    pCtx.fillStyle = '#fff9c4';
-                    pCtx.shadowBlur = 10;
-                    pCtx.shadowColor = '#fff9c4';
-                    pCtx.fill();
-
-                    preRenderedFlowers.push(pCanvas);
-                }
-            });
-        }
-        initPreRenders();
-
-        function resize() {
-            const dpr = Math.min(window.devicePixelRatio || 1, 3);
-            canvas.width = window.innerWidth * dpr;
-            canvas.height = window.innerHeight * dpr;
-            canvas.style.width = `${window.innerWidth}px`;
-            canvas.style.height = `${window.innerHeight}px`;
-            ctx.scale(dpr, dpr);
-            width = window.innerWidth;
-            height = window.innerHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
-        function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
-
-        class Flower {
-            constructor(x, y) {
-                this.startX = x;
-                this.targetY = y;
-                this.baseY = height + 50; 
-                this.maxHeight = this.baseY - y;
-                this.stemProgress = 0;
-                this.bloomProgress = 0;
-                this.cachedImage = preRenderedFlowers[Math.floor(Math.random() * preRenderedFlowers.length)];
-                this.swayOffset = Math.random() * 1000;
-                this.swaySpeed = Math.random() * 0.02 + 0.01;
-                this.staticRotation = Math.random() * Math.PI * 2; 
-            }
-            update() {
-                if (this.stemProgress < 1) this.stemProgress += 0.015;
-                else if (this.bloomProgress < 1) this.bloomProgress += 0.008;
-            }
-            draw() {
-                const currentHeight = this.maxHeight * easeOut(this.stemProgress);
-                const sway = Math.sin(time * this.swaySpeed + this.swayOffset) * 20 * (currentHeight / this.maxHeight);
-                const headX = this.startX + sway;
-                const headY = this.baseY - currentHeight;
-
-                ctx.save();
-                ctx.beginPath();
-                ctx.moveTo(this.startX, this.baseY);
-                ctx.quadraticCurveTo(this.startX, this.baseY - currentHeight / 2, headX, headY);
-                
-                const stemGradient = ctx.createLinearGradient(this.startX, this.baseY, headX, headY);
-                stemGradient.addColorStop(0, '#1a4a2b');
-                stemGradient.addColorStop(1, '#4ade80');
-                
-                ctx.strokeStyle = stemGradient;
-                ctx.lineWidth = 4 * easeOut(this.stemProgress);
-                ctx.lineCap = 'round';
-                ctx.stroke();
-
-                if (this.stemProgress >= 0.5) {
-                    const bloomEase = easeOut(this.bloomProgress);
-                    ctx.translate(headX, headY);
-                    ctx.rotate(this.staticRotation); 
-                    const drawSize = cacheSize * bloomEase;
-                    ctx.drawImage(this.cachedImage, -drawSize / 2, -drawSize / 2, drawSize, drawSize);
-                }
-                ctx.restore();
-            }
+            let rand = Math.random();
+            let chosenColor = rand < 0.33 ? c1 : rand < 0.66 ? c2 : c3;
+            colors[i * 3] = chosenColor.r;
+            colors[i * 3 + 1] = chosenColor.g;
+            colors[i * 3 + 2] = chosenColor.b;
         }
 
-        class Vine {
-            constructor(startX, startY) {
-                this.points = [{x: startX, y: startY}];
-                this.blooms = [];
-                this.lastBloomPoint = {x: startX, y: startY};
-                this.lastDrawPoint = {x: startX, y: startY};
-            }
-            addPoint(x, y) {
-                const dx = x - this.lastDrawPoint.x;
-                const dy = y - this.lastDrawPoint.y;
-                const distToLast = Math.sqrt(dx*dx + dy*dy);
-                
-                if (distToLast > 12) {
-                    this.points.push({x, y});
-                    this.lastDrawPoint = {x, y};
-                    
-                    const bx = x - this.lastBloomPoint.x;
-                    const by = y - this.lastBloomPoint.y;
-                    const distToBloom = Math.sqrt(bx*bx + by*by);
-                    
-                    if (distToBloom > 70) {
-                        this.blooms.push({
-                            x: x, 
-                            y: y, 
-                            progress: 0,
-                            cachedImage: preRenderedFlowers[Math.floor(Math.random() * preRenderedFlowers.length)],
-                            rotation: Math.random() * Math.PI * 2
-                        });
-                        this.lastBloomPoint = {x, y};
-                    }
-                }
-            }
-            update() {
-                this.blooms.forEach(b => {
-                    if (b.progress < 1) b.progress += 0.015;
-                });
-            }
-            draw() {
-                if (this.points.length < 2) return;
-                
-                ctx.save();
-                ctx.beginPath();
-                ctx.moveTo(this.points[0].x, this.points[0].y);
-                for(let i = 1; i < this.points.length; i++) {
-                    ctx.lineTo(this.points[i].x, this.points[i].y);
-                }
-                
-                ctx.strokeStyle = '#4ade80';
-                ctx.shadowColor = '#4ade80';
-                ctx.shadowBlur = 10;
-                ctx.lineWidth = 4;
-                ctx.lineCap = 'round';
-                ctx.lineJoin = 'round';
-                ctx.stroke();
+        const particleGeo = new THREE.BufferGeometry();
+        particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particleGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        const spaceDust = new THREE.Points(particleGeo, warpShaderMaterial);
+        scene.add(spaceDust);
 
-                ctx.shadowBlur = 0;
+        const targetGeo = new THREE.IcosahedronGeometry(window.innerWidth < 768 ? 8 : 12, 4);
+        const targetMat = new THREE.MeshBasicMaterial({ color: 0x00d2ff, wireframe: true, transparent: true, opacity: 0.4 });
+        const coreGrid = new THREE.Mesh(targetGeo, targetMat);
+        coreGrid.position.copy(pathPoints[pathPoints.length - 1]);
+        scene.add(coreGrid);
 
-                this.blooms.forEach(b => {
-                    const bloomEase = easeOut(b.progress);
-                    if (bloomEase > 0.01) {
-                        ctx.translate(b.x, b.y);
-                        ctx.rotate(b.rotation);
-                        const drawSize = cacheSize * bloomEase * 0.8; 
-                        ctx.drawImage(b.cachedImage, -drawSize / 2, -drawSize / 2, drawSize, drawSize);
-                        ctx.rotate(-b.rotation);
-                        ctx.translate(-b.x, -b.y);
-                    }
-                });
-                ctx.restore();
-            }
-        }
+        const mouse = { x: 0, y: 0, targetX: 0, targetY: 0 };
+        const handleMove = (x, y) => {
+            mouse.targetX = (x / window.innerWidth) - 0.5;
+            mouse.targetY = (y / window.innerHeight) - 0.5;
+        };
+        window.addEventListener('mousemove', (e) => handleMove(e.clientX, e.clientY));
+        window.addEventListener('touchmove', (e) => {
+            if(e.touches.length > 0) handleMove(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: true });
 
+        // SMOOTH INTERPOLATED SCROLL MECHANICS
+        let targetScrollPercent = 0;
+        let currentScrollPercent = 0;
+        let lastScrollPercent = 0;
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            targetScrollPercent = maxScroll <= 0 ? 0 : Math.max(0, Math.min(1, scrollTop / maxScroll));
+        }, { passive: true });
+
+        let audioContext, analyser, dataArray;
+        document.getElementById('audioInit').addEventListener('click', function() {
+            this.style.display = 'none';
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 64;
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+            let oscillator = audioContext.createOscillator();
+            let filter = audioContext.createBiquadFilter();
+            let gainNode = audioContext.createGain();
+
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.setValueAtTime(55, audioContext.currentTime);
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(220, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+
+            oscillator.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(analyser);
+            analyser.connect(audioContext.destination);
+            oscillator.start();
+        });
+
+        const clock = new THREE.Clock();
         function animate() {
-            ctx.clearRect(0, 0, width, height); 
-            time++;
-            
-            flowers.forEach(flower => { flower.update(); flower.draw(); });
-            vines.forEach(vine => { vine.update(); vine.draw(); });
-            
             requestAnimationFrame(animate);
-        }
+            const elapsedTime = clock.getElapsedTime();
 
-        const uiTop = document.getElementById('ui-top');
-        const uiBottom = document.getElementById('ui-bottom');
-        const watermark = document.getElementById('watermark');
-
-        function setUIOpacity(opacity) {
-            uiTop.style.opacity = opacity;
-            uiBottom.style.opacity = opacity;
-            watermark.style.opacity = opacity;
-        }
-
-        // AUDIO LOGIC
-        let isMusicPlaying = false;
-        const bgm = document.getElementById('bgm');
-        bgm.volume = 0.5; // Starts at 50% volume
-
-        function startMusic() {
-            if (!isMusicPlaying) {
-                bgm.play().catch(e => console.log("Audio play blocked until interaction:", e));
-                isMusicPlaying = true;
-            }
-        }
-
-        let isDrawing = false;
-        let currentVine = null;
-        let startPos = {x: 0, y: 0};
-
-        canvas.addEventListener('pointerdown', (e) => {
-            startMusic(); // Triggers music on tap/swipe
-            isDrawing = true;
-            startPos = {x: e.clientX, y: e.clientY};
-            currentVine = new Vine(e.clientX, e.clientY);
-            vines.push(currentVine);
-            setUIOpacity('0.1');
-        });
-
-        canvas.addEventListener('pointermove', (e) => {
-            if (!isDrawing) return;
-            currentVine.addPoint(e.clientX, e.clientY);
-        });
-
-        window.addEventListener('pointerup', (e) => {
-            if (!isDrawing) return;
-            isDrawing = false;
+            mouse.x += (mouse.targetX - mouse.x) * 0.05;
+            mouse.y += (mouse.targetY - mouse.y) * 0.05;
             
-            const dx = e.clientX - startPos.x;
-            const dy = e.clientY - startPos.y;
-            const dist = Math.sqrt(dx*dx + dy*dy);
+            // Linear Interpolation (Lerp) for Camera Path Smoothness
+            currentScrollPercent += (targetScrollPercent - currentScrollPercent) * 0.04; // Lower value = smoother drift
+
+            // Calculate exact camera position and orientation on the curve
+            const currentPosition = curve.getPointAt(currentScrollPercent);
+            const lookTarget = curve.getPointAt(Math.min(currentScrollPercent + 0.01, 1));
+            camera.position.copy(currentPosition);
+            camera.lookAt(lookTarget);
+            camera.rotation.z = Math.sin(currentScrollPercent * Math.PI * 3) * 0.15;
+
+            // Generate precise speed metrics from interpolated movement tracking
+            let scrollDelta = Math.abs(currentScrollPercent - lastScrollPercent);
+            lastScrollPercent = currentScrollPercent;
             
-            if (dist < 10) {
-                vines.pop(); 
-                flowers.push(new Flower(e.clientX, e.clientY)); 
+            let calculatedWarp = Math.min(scrollDelta * 45.0, 2.5);
+            warpShaderMaterial.uniforms.uWarp.value += (calculatedWarp - warpShaderMaterial.uniforms.uWarp.value) * 0.08;
+            warpShaderMaterial.uniforms.uWarp.value *= 0.92;
+            warpShaderMaterial.uniforms.uTime.value = elapsedTime;
+
+            spaceDust.rotation.z = (elapsedTime * 0.015) + (mouse.x * 0.05);
+            spaceDust.position.x = mouse.x * 1.2;
+            spaceDust.position.y = -mouse.y * 1.2;
+
+            let audioScaleModifier = 1.0;
+            if (analyser) {
+                analyser.getByteFrequencyData(dataArray);
+                let averageFreq = 0;
+                for (let i = 0; i < dataArray.length; i++) averageFreq += dataArray[i];
+                averageFreq /= dataArray.length;
+                
+                audioScaleModifier = 1.0 + (averageFreq / 255.0) * 0.6;
+                bloomPass.strength = 2.2 + (averageFreq / 255.0) * 1.5;
             }
-            currentVine = null;
-        });
 
-        document.getElementById('clearBtn').addEventListener('click', () => {
-            flowers = [];
-            vines = []; 
-            setUIOpacity('1');
-        });
+            coreGrid.scale.set(audioScaleModifier, audioScaleModifier, audioScaleModifier);
+            coreGrid.rotation.y = elapsedTime * 0.12;
+            coreGrid.rotation.x = elapsedTime * 0.06;
 
-        document.getElementById('autoBloomBtn').addEventListener('click', (e) => {
-            startMusic(); // Triggers music if they hit auto bloom first
-            const btn = e.target;
-            if (autoBloomInterval) {
-                clearInterval(autoBloomInterval);
-                autoBloomInterval = null;
-                btn.innerText = '▶ Auto Bloom';
-                btn.style.color = '#fff';
-            } else {
-                setUIOpacity('0.1');
-                btn.innerText = '⏸ Stop Bloom';
-                btn.style.color = '#ffb3c6';
-                autoBloomInterval = setInterval(() => {
-                    const randomX = Math.random() * width;
-                    const randomY = height - (Math.random() * (height * 0.5) + 150);
-                    flowers.push(new Flower(randomX, randomY));
-                }, 500); 
-            }
-        });
-
+            composer.render();
+        }
         animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+            warpShaderMaterial.uniforms.uSize.value = window.innerWidth < 768 ? 0.12 : 0.18;
+        });
     </script>
 </body>
 </html>
